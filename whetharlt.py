@@ -121,7 +121,6 @@ while True:
                 print('heat not stable')
 
     if cnt % WEATHER_RESET_AT_CNT == 0:
-        cnt = 0
 
         weather = get_local_weather()
 
@@ -129,7 +128,10 @@ while True:
             push_feed_data('temp-local', weather['temp'])
             push_feed_data('humidity-local', weather['humidity'])
 
-    cnt = cnt + 1
+    if cnt % WEATHER_RESET_AT_CNT == 0:
+        cnt = 0
+    else:
+        cnt = cnt + 1
 
     # testing
     # data = get_sample_data();
