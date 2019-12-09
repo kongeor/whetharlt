@@ -100,6 +100,12 @@ def get_local_weather():
     except:
         logging.exception('Unexpected weather exception')
 
+DEFAULT_SLEEP = 15 # seconds
+FETCH_WEATHER_EVERY_MINS = 5
+
+WEATHER_RESET_AT_CNT = (FETCH_WEATHER_EVERY_MINS * 60) / DEFAULT_SLEEP;
+
+cnt = 0;
 
 while True:
     if sensor.get_sensor_data():
@@ -109,6 +115,11 @@ while True:
 
         if sensor.data.heat_stable:
             push_feed_data('gasres', sensor.data.gas_resistance)
+        else:
+            print('heat not stable')
+
+    if cnt % WEATHER_RESET_AT_CNT == 0:
+        cnt = 0
 
         weather = get_local_weather()
 
@@ -116,8 +127,7 @@ while True:
             push_feed_data('temp_local', weather['temp'])
             push_feed_data('humidity_local', weather['humidity'])
 
-        else:
-            print(output)
+    cnt = cnt + 1
 
     # testing
     # data = get_sample_data();
@@ -126,4 +136,4 @@ while True:
     # push_feed_data('humidity', data['humidity'])
     # push_feed_data('gasres', data['gasres'])
 
-    time.sleep(60)
+    time.sleep(DEFAULT_SLEEP)
