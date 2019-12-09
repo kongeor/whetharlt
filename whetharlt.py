@@ -96,7 +96,7 @@ def get_local_weather():
             content = f.read().decode('utf-8')
             data = json.loads(content)
             return {'temp': data['main']['temp'],
-                    'humitidy': data['main']['humidity']}
+                    'humidity': data['main']['humidity']}
     except:
         logging.exception('Unexpected weather exception')
 
@@ -109,14 +109,16 @@ cnt = 0;
 
 while True:
     if sensor.get_sensor_data():
-        push_feed_data('temperature', sensor.data.temperature)
-        # push_feed_data('pressure', sensor.data.pressure)
-        push_feed_data('humidity', sensor.data.humidity)
+        # TODO
+        if cnt % 15 == 0:
+            push_feed_data('temperature', sensor.data.temperature)
+            # push_feed_data('pressure', sensor.data.pressure)
+            push_feed_data('humidity', sensor.data.humidity)
 
-        if sensor.data.heat_stable:
-            push_feed_data('gasres', sensor.data.gas_resistance)
-        else:
-            print('heat not stable')
+            if sensor.data.heat_stable:
+                push_feed_data('gasres', sensor.data.gas_resistance)
+            else:
+                print('heat not stable')
 
     if cnt % WEATHER_RESET_AT_CNT == 0:
         cnt = 0
@@ -124,8 +126,8 @@ while True:
         weather = get_local_weather()
 
         if weather:
-            push_feed_data('temp_local', weather['temp'])
-            push_feed_data('humidity_local', weather['humidity'])
+            push_feed_data('temp-local', weather['temp'])
+            push_feed_data('humidity-local', weather['humidity'])
 
     cnt = cnt + 1
 
