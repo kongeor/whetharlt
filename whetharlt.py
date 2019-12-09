@@ -1,8 +1,11 @@
+import bme680
 import random
 import time
 import sys
 import os
 import logging
+import urllib.request
+import json
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
@@ -84,17 +87,34 @@ def push_feed_data(feed, val):
         data = Data(value=val)
         aio.create_data(feed, data)
     except:
-        logging.exception("Unexpected error")
+        logging.exception('Unexpected error')
+
+def get_local_weather():
+    try:
+        with urllib.request.urlopen('https://api.openweathermap.org/data/2.5/weather?id=' +
+            os.getenv('OPEN_WEATHER_ID') + '&units=metric&APPID=' + os.getenv('OPEN_WEATHER_API_KEY')) as f:
+            content = f.read().decode('utf-8')
+            data = json.loads(content)
+            return {'temp': data['main']['temp'],
+                    'humitidy': data['main']['humidity']}
+    except:
+        logging.exception('Unexpected weather exception')
 
 
 while True:
     if sensor.get_sensor_data():
         push_feed_data('temperature', sensor.data.temperature)
-        push_feed_data('pressure', sensor.data.pressure)
+        # push_feed_data('pressure', sensor.data.pressure)
         push_feed_data('humidity', sensor.data.humidity)
 
         if sensor.data.heat_stable:
             push_feed_data('gasres', sensor.data.gas_resistance)
+
+        weather = get_local_weather()
+
+        if weather:
+            push_feed_data('temp_local', weather['temp'])
+            push_feed_data('humidity_local', weather['humidity'])
 
         else:
             print(output)
