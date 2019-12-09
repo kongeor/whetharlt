@@ -108,6 +108,9 @@ WEATHER_RESET_AT_CNT = (FETCH_WEATHER_EVERY_MINS * 60) / DEFAULT_SLEEP;
 cnt = 0;
 
 while True:
+    if cnt % WEATHER_RESET_AT_CNT == 0:
+        cnt = 0
+
     if sensor.get_sensor_data():
         # TODO
         if cnt % 15 == 0:
@@ -128,10 +131,7 @@ while True:
             push_feed_data('temp-local', weather['temp'])
             push_feed_data('humidity-local', weather['humidity'])
 
-    if cnt % WEATHER_RESET_AT_CNT == 0:
-        cnt = 0
-    else:
-        cnt = cnt + 1
+    cnt = cnt + 1
 
     # testing
     # data = get_sample_data();
